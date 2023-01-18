@@ -33,6 +33,7 @@ In the future, an additional button to copy the code in the clipboard might prov
 ## Notes
 - Because the API calls to GitHub are made from the browser, the user is limited to 60 requests per hour. This is a limitation of the GitHub API and not the app itself. 
 - The forks for each gist are loaded by creating multiple threads to fetch the forks for each gist. This might pose an issue if GitHub API decides to limit the number of concurrent requests in the future.
+- To avoid contents overflow, some lists have autoscrolling: the list of gists has vertical auto scrolling and the list of forks for each gist has horizontal auto scrolling.
 - For performance reasons, the file contents for each gist are not loaded until the user clicks on the gist's title. The result is cached, to avoid making repeated requests to the GitHub API endpoint. In the future, a separate 'Refresh' button can be added to trigger refreshing the file contents.
 - The app is not responsive. It was tested on a 1920x1080 screen and it looks good. It might not look good on smaller screens.
 

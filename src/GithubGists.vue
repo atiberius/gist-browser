@@ -23,26 +23,27 @@
         <div v-if="gists.length > 0">
           <div id="gistsTitle">Public gists:</div>
           <AccordionList id="gistsAccordion" open-multiple-items>
+
             <AccordionItem v-for="gist in gists" :key="gist.id" default-opened>
               <template #summary>
                 <span class="gistTitle" :title="gist.description">
                   <span>{{ gist.title ?gist.title : (gist.description ?gist.description.substring(0, 100) + (gist.description.length > 100 ?'...' :'') :'[No title]') }}</span>
-                  <span class="timeago" :title="new Date(gist.created_at)">{{this.timeAgoFormatter.format(new Date(gist.created_at))}}</span>
+                  <span class="timeago" :title="new Date(gist.created_at)">Created {{this.timeAgoFormatter.format(new Date(gist.created_at))}}</span>
                 </span>
               </template>
               <div v-if="gist.forks.length > 0" class="forkedBy">
                 <div class="forkedByTitle">Forked by:</div>
                 <div class="forkedByList">
                   <div v-for="fork in gist.forks" :key="fork.owner.login" class="forkedByUser">
-                    <img :src="fork.owner.avatar_url" class="forkedByAvatar"/> <span>{{ fork.owner.login }}</span>
+                    <img :src="fork.owner.avatar_url" class="forkedByAvatar" alt="User avatar"/> <span>{{ fork.owner.login }}</span>
                   </div>
                 </div>
               </div>
-              <p>Files:</p>
+              <p class="filesTitle">Files:</p>
               <AccordionList id="gistFilesAccordion" open-multiple-items>
-                <AccordionItem v-for="file in gist.files" :key="file.filename" @click="loadGistFiles(gist.id)">
+                <AccordionItem v-for="(file, , idx) in gist.files" :key="file.filename" @click="loadGistFiles(gist.id)">
                     <template #summary :class="headerExpandFile">
-                      <span>{{ file.filename }}</span>
+                      <span>{{idx + 1}}. {{ file.filename }}</span>
                       <span :class="'badge badge-' + file.language.toLowerCase()" v-if="file.language">{{ file.language }}</span>
                     </template>
                   <div v-if="this.gistFileContents[gist.id]">
@@ -81,11 +82,12 @@ export default {
   },
   data() {
     return {
-      // username: '',
+      username: '',
+      // username: "vsouza",
       user: null,
       gists: [],
+      currentFileIndex: 0,
       gistFileContents: [],
-      username: "vsouza",
       pendingRequest: false,
       errMessage: null,
       timeAgoFormatter: new TimeAgo('en-US'),
@@ -102,12 +104,19 @@ export default {
           const {data: user} = await axios.get(`https://api.github.com/users/${this.username}`);
           this.user = user;
         } catch (err) {
-          if (err.hasOwnProperty('response') && err.response.status === 404) {
-            this.errMessage = `User ${this.username} not found`;
-          } else {
-            this.errMessage = `There has been an error while reading information about user ${this.username}:<br/>` + err.message;
+          if (err.hasOwnProperty('response')) {
+            switch (err.response.status) {
+              case 404:
+                this.errMessage = `User ${this.username} not found`;
+                break;
+              case 403:
+                this.errMessage = `Access forbidden. Probably too many API requests in the last hour. Please try again later.`;
+                break;
+              default:
+                this.errMessage = `There has been an error while reading information about user ${this.username}:<br/>` + err.message;
+                console.error(err);
+            }
           }
-          console.error(err);
           this.user = null;
         }
         finally {
@@ -122,7 +131,6 @@ export default {
             this.gists = gists;
             const forksPromises = gists.map(gist => axios.get(gist.forks_url));
             const gistForks = await Promise.all(forksPromises);
-            console.log(gistForks);
 
             gists.forEach((gist, index) => {
               gist.forks = gistForks[index].data;
@@ -149,22 +157,17 @@ export default {
         return true;
       }
       else {
-        // this.pendingRequest = true;
-        // this.errMessage = null;
         try {
           const {data} = await axios.get(`https://api.github.com/gists/${id}`);
-          // console.log(data.files);
           this.gistFileContents[id] = [];
           Object.entries(data.files).forEach(entry => {
             const [filename, details] = entry;
             this.gistFileContents[id][filename] = details['content'];
           });
-          // console.log(this.gistFileContents[id]);
         } catch (err) {
+          this.gistFileContents[id] = [];
           alert(`There has been an error reading gist ${id}\r\n` + err.message);
-          console.error(err);
-        } finally {
-          // this.pendingRequest = false;
+          // console.error(err);
         }
       }
     },

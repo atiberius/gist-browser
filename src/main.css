@@ -1,10 +1,15 @@
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+body {
+  display: flex;
+  place-items: center;
+}
 
+#app {
+  width: 100vw;
   font-weight: normal;
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 a,
@@ -17,19 +22,6 @@ a,
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
   }
 }
 
@@ -71,15 +63,14 @@ a,
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  width: 100vw;
 }
 
 #gists {
   margin-left: 2vw;
-  /*white-space: nowrap;*/
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  max-width: 50vw;
 }
 
 #gistsAccordion {
@@ -121,7 +112,7 @@ a,
 
 #codeHighlight {
   max-height: 50vh;
-  overflow-y: auto;
+  overflow: auto;
 }
 
 #gists .accordion-item__summary {
@@ -190,4 +181,10 @@ a,
 img.forkedByAvatar {
   max-height: 5vh;
   margin-right: .5vw;
+}
+
+.filesTitle {
+  font-weight: bolder;
+  text-decoration: underline;
+  margin-bottom: 1vh;
 }
