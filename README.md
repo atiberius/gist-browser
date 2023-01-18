@@ -24,7 +24,6 @@ If the user is found, a list of his public gists is displayed in an accordion. E
 All gists accordion items are expanded by default. For each file contained in the gist there is a foldable accordion item, with the name and the programming language badge displayed on the right hand side. Clicking on it will trigger an asynchroneous request to the GitHub API to fetch the file content and display it in a code highlight component.
 In the future, an additional button to copy the code in the clipboard might prove useful here.
 
-
 ## External Components
 - [javascript-time-ago](https://www.npmjs.com/package/javascript-time-ago) is used to display the gists' creation date as elapsed time to present
 - [highlight.js](https://highlightjs.org/) and its [Vue.js plugin](https://github.com/highlightjs/vue-plugin) are used to highlight the source code inside gists
