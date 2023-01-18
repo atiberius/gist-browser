@@ -1,0 +1,193 @@
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  font-weight: normal;
+  min-height: 100vh;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+  }
+}
+
+ .badge {
+   padding: 5px;
+   border-radius: 5px;
+   margin-right: 5px;
+ }
+
+.badge-swift, .badge-markdown, .badge-go, .badge-shell, .badge-fish {
+  background-color: yellow;
+}
+
+.badge-python, .badge-javascript {
+  background-color: #3572A5;
+  color: white;
+}
+
+#searchForm {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#searchBar {
+  margin-bottom: 1vh;
+  align-self: flex-start;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+}
+
+#searchBar button {
+  margin-left: 1vw;
+}
+
+#result {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100vw;
+}
+
+#gists {
+  margin-left: 2vw;
+  /*white-space: nowrap;*/
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#gistsAccordion {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+#gistsTitle {
+  font-size: 1.2em;
+  font-weight: bolder;
+}
+
+#generalInfo {
+  max-width: 50vh;
+}
+
+#usernameBio {
+  font-size: 1.25em;
+  margin-bottom: 2vh
+}
+
+#userFullname {
+  font-weight: bolder;
+  font-size: 1.25em;
+}
+
+#userAvatar {
+  max-width: 25vh;
+  border-radius: 50%;
+}
+
+#errMessage {
+  color: red;
+}
+
+#gistsAccordion, #gistFilesAccordion {
+  max-width: 50vw;
+}
+
+#codeHighlight {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+#gists .accordion-item__summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+#gists .accordion-item__summary-title {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+#gists .gistTitle {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+#gists .gistTitle .timeago {
+  color: black;
+  font-weight: normal;
+  font-size: .8em;
+}
+
+#gists .accordion-item__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.forkedBy {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.forkedByTitle {
+  white-space: nowrap;
+  font-weight: bolder;
+  text-decoration: underline;
+  margin-bottom: 1vh;
+}
+
+.forkedByList {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 48vw;
+  overflow-x: auto;
+
+}
+
+.forkedByUser {
+  margin-left: .5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+img.forkedByAvatar {
+  max-height: 5vh;
+  margin-right: .5vw;
+}

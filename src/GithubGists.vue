@@ -1,0 +1,175 @@
+<template>
+  <div id="searchForm">
+    <div id="searchBar">
+      <input placeholder="Github username" v-model="username" type="text" id="username" @keyup.enter="getGists()"/>
+      <button @click="getGists()">Search</button>
+    </div>
+    <div id="pendingMessage" v-if="pendingRequest">
+      <p>Searching...</p>
+    </div>
+    <div id="errMessage" v-else-if="errMessage" v-html="errMessage"></div>
+    <div id="result" v-else-if="user">
+      <div id="generalInfo">
+        <img id="userAvatar" :src="user.avatar_url" alt="user.name"/>
+        <div v-if="user.name">
+          <div id="userFullname">{{ user.name }}</div>
+          <div id="usernameBio">{{ this.username }}</div>
+        </div>
+        <div v-if="user.bio">
+          <div>{{ user.bio }}</div>
+        </div>
+      </div>
+      <div id="gists">
+        <div v-if="gists.length > 0">
+          <div id="gistsTitle">Public gists:</div>
+          <AccordionList id="gistsAccordion" open-multiple-items>
+            <AccordionItem v-for="gist in gists" :key="gist.id" default-opened>
+              <template #summary>
+                <span class="gistTitle" :title="gist.description">
+                  <span>{{ gist.title ?gist.title : (gist.description ?gist.description.substring(0, 100) + (gist.description.length > 100 ?'...' :'') :'[No title]') }}</span>
+                  <span class="timeago" :title="new Date(gist.created_at)">{{this.timeAgoFormatter.format(new Date(gist.created_at))}}</span>
+                </span>
+              </template>
+              <div v-if="gist.forks.length > 0" class="forkedBy">
+                <div class="forkedByTitle">Forked by:</div>
+                <div class="forkedByList">
+                  <div v-for="fork in gist.forks" :key="fork.owner.login" class="forkedByUser">
+                    <img :src="fork.owner.avatar_url" class="forkedByAvatar"/> <span>{{ fork.owner.login }}</span>
+                  </div>
+                </div>
+              </div>
+              <p>Files:</p>
+              <AccordionList id="gistFilesAccordion" open-multiple-items>
+                <AccordionItem v-for="file in gist.files" :key="file.filename" @click="loadGistFiles(gist.id)">
+                    <template #summary :class="headerExpandFile">
+                      <span>{{ file.filename }}</span>
+                      <span :class="'badge badge-' + file.language.toLowerCase()" v-if="file.language">{{ file.language }}</span>
+                    </template>
+                  <div v-if="this.gistFileContents[gist.id]">
+                    <highlightjs autodetect :code="this.gistFileContents[gist.id][file.filename]" id="codeHighlight" v-if="this.gistFileContents[gist.id][file.filename]"/>
+                  </div>
+                  <div v-else>
+                    <p>Loading {{file.filename}}...</p>
+                  </div>
+                </AccordionItem>
+              </AccordionList>
+            </AccordionItem>
+          </AccordionList>
+        </div>
+        <div id="gistsNotFound" v-if="gists.length === 0">No public gists found.</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+
+import axios from 'axios';
+import 'highlight.js/lib/common';
+import hljsVuePlugin from "@highlightjs/vue-plugin";
+import { AccordionList, AccordionItem } from "vue3-rich-accordion";
+import TimeAgo from 'javascript-time-ago';
+
+import "vue3-rich-accordion/accordion-library-styles.css";
+import 'highlight.js/styles/default.css';
+
+export default {
+  components: {
+    highlightjs: hljsVuePlugin.component,
+    TimeAgo,
+    AccordionList, AccordionItem
+  },
+  data() {
+    return {
+      // username: '',
+      user: null,
+      gists: [],
+      gistFileContents: [],
+      username: "vsouza",
+      pendingRequest: false,
+      errMessage: null,
+      timeAgoFormatter: new TimeAgo('en-US'),
+    }
+  },
+  methods: {
+    async getGists() {
+      if (this.username.length > 0) {
+        this.pendingRequest = true;
+        this.errMessage = null;
+        this.gists = [];
+        this.gistFileContents = [];
+        try {
+          const {data: user} = await axios.get(`https://api.github.com/users/${this.username}`);
+          this.user = user;
+        } catch (err) {
+          if (err.hasOwnProperty('response') && err.response.status === 404) {
+            this.errMessage = `User ${this.username} not found`;
+          } else {
+            this.errMessage = `There has been an error while reading information about user ${this.username}:<br/>` + err.message;
+          }
+          console.error(err);
+          this.user = null;
+        }
+        finally {
+          this.pendingRequest = false;
+        }
+
+        if (this.user != null) {
+          this.pendingRequest = true;
+          this.errMessage = null;
+          try {
+            const {data: gists} = await axios.get(`https://api.github.com/users/${this.username}/gists`);
+            this.gists = gists;
+            const forksPromises = gists.map(gist => axios.get(gist.forks_url));
+            const gistForks = await Promise.all(forksPromises);
+            console.log(gistForks);
+
+            gists.forEach((gist, index) => {
+              gist.forks = gistForks[index].data;
+            });
+
+          } catch (err) {
+            this.errMessage = `There has been an error reading gists from user ${this.username}<br/>` + err.message;
+          }
+          finally {
+            this.pendingRequest = false;
+          }
+        }
+      }
+      else {
+        this.user = null;
+        this.gists = [];
+        this.gistFileContents = [];
+        this.errMessage = null;
+      }
+    },
+
+    async loadGistFiles(id) {
+      if (this.gistFileContents[id]) {
+        return true;
+      }
+      else {
+        // this.pendingRequest = true;
+        // this.errMessage = null;
+        try {
+          const {data} = await axios.get(`https://api.github.com/gists/${id}`);
+          // console.log(data.files);
+          this.gistFileContents[id] = [];
+          Object.entries(data.files).forEach(entry => {
+            const [filename, details] = entry;
+            this.gistFileContents[id][filename] = details['content'];
+          });
+          // console.log(this.gistFileContents[id]);
+        } catch (err) {
+          alert(`There has been an error reading gist ${id}\r\n` + err.message);
+          console.error(err);
+        } finally {
+          // this.pendingRequest = false;
+        }
+      }
+    },
+
+  },
+}
+</script>
+
