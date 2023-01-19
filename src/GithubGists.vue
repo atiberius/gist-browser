@@ -1,8 +1,9 @@
 <template>
-  <div id="searchForm">
+  <form @submit.prevent="getGists">
+    <div id="searchForm">
     <div id="searchBar">
-      <input placeholder="Github username" v-model="username" type="text" id="username" @keyup.enter="getGists()"/>
-      <button @click="getGists()">Search</button>
+      <input placeholder="Github username" v-model="username" type="text" id="username" @keyup.enter="this.form.submit()"/>
+      <button type="submit">Search</button>
     </div>
     <div id="pendingMessage" v-if="pendingRequest">
       <p>Searching...</p>
@@ -61,6 +62,7 @@
       </div>
     </div>
   </div>
+  </form>
 </template>
 
 <script>
