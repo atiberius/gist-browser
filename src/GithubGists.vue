@@ -130,10 +130,10 @@ export default {
             const {data: gists} = await axios.get(`https://api.github.com/users/${this.username}/gists`);
             this.gists = gists;
             const forksPromises = gists.map(gist => axios.get(gist.forks_url));
-            const gistForks = await Promise.all(forksPromises);
+            const gistForks = await Promise.allSettled(forksPromises);
 
             gists.forEach((gist, index) => {
-              gist.forks = gistForks[index].data;
+              gist.forks = gistForks[index].status === 'fulfilled' ?gistForks[index].value.data :[];
             });
 
           } catch (err) {
