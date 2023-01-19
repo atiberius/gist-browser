@@ -2,7 +2,7 @@
   <form @submit.prevent="getGists">
     <div id="searchForm">
     <div id="searchBar">
-      <input placeholder="Github username" v-model="username" type="text" id="username" @keyup.enter="this.form.submit()"/>
+      <input placeholder="Github username" v-model="username" type="text" id="username"/>
       <button type="submit">Search</button>
     </div>
     <div id="pendingMessage" v-if="pendingRequest">
