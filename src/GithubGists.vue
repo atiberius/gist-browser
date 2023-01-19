@@ -14,7 +14,7 @@
         <img id="userAvatar" :src="user.avatar_url" alt="user.name"/>
         <div v-if="user.name">
           <div id="userFullname">{{ user.name }}</div>
-          <div id="usernameBio">{{ this.username }}</div>
+          <div id="usernameBio">{{ username }}</div>
         </div>
         <div v-if="user.bio">
           <div>{{ user.bio }}</div>
@@ -28,8 +28,8 @@
             <AccordionItem v-for="gist in gists" :key="gist.id" default-opened>
               <template #summary>
                 <span class="gistTitle" :title="gist.description">
-                  <span>{{ gist.title ?gist.title : (gist.description ?gist.description.substring(0, 100) + (gist.description.length > 100 ?'...' :'') :'[No title]') }}</span>
-                  <span class="timeago" :title="new Date(gist.created_at)">Created {{this.timeAgoFormatter.format(new Date(gist.created_at))}}</span>
+                  <span>{{ gist.title }}</span>
+                  <span class="timeago" :title="gist.createdDateFriendly">Created {{gist.timeAgo}}</span>
                 </span>
               </template>
               <div v-if="gist.forks.length > 0" class="forkedBy">
@@ -47,8 +47,8 @@
                       <span>{{idx + 1}}. {{ file.filename }}</span>
                       <span :class="'badge badge-' + file.language.toLowerCase()" v-if="file.language">{{ file.language }}</span>
                     </template>
-                  <div v-if="this.gistFileContents[gist.id]">
-                    <highlightjs autodetect :code="this.gistFileContents[gist.id][file.filename]" id="codeHighlight" v-if="this.gistFileContents[gist.id][file.filename]"/>
+                  <div v-if="gistFileContents[gist.id]">
+                    <highlightjs autodetect :code="gistFileContents[gist.id][file.filename]" id="codeHighlight" v-if="gistFileContents[gist.id][file.filename]"/>
                   </div>
                   <div v-else>
                     <p>Loading {{file.filename}}...</p>
@@ -134,6 +134,11 @@ export default {
           try {
             const {data: gists} = await axios.get(`https://api.github.com/users/${this.filteredUsername}/gists`);
             this.gists = gists;
+            gists.forEach((gist, ) => {
+              gist.title = gist.title ?gist.title : (gist.description ?gist.description.substring(0, 100) + (gist.description.length > 100 ?'...' :'') :'[No title]');
+              gist.createdDateFriendly = new Date(gist.created_at);
+              gist.timeAgo = this.timeAgoFormatter.format(gist.createdDateFriendly);
+            })
             const forksPromises = gists.map(gist => axios.get(gist.forks_url));
             const gistForks = await Promise.allSettled(forksPromises);
 
