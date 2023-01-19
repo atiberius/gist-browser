@@ -70,6 +70,8 @@ import 'highlight.js/lib/common';
 import hljsVuePlugin from "@highlightjs/vue-plugin";
 import { AccordionList, AccordionItem } from "vue3-rich-accordion";
 import TimeAgo from 'javascript-time-ago';
+import DOMPurify from 'dompurify';
+
 
 import "vue3-rich-accordion/accordion-library-styles.css";
 import 'highlight.js/styles/default.css';
@@ -83,7 +85,7 @@ export default {
   data() {
     return {
       username: '',
-      // username: "vsouza",
+      filteredUsername: '',
       user: null,
       gists: [],
       currentFileIndex: 0,
@@ -101,19 +103,20 @@ export default {
         this.gists = [];
         this.gistFileContents = [];
         try {
-          const {data: user} = await axios.get(`https://api.github.com/users/${this.username}`);
+          this.filteredUsername = DOMPurify.sanitize(this.username);
+          const {data: user} = await axios.get(`https://api.github.com/users/${this.filteredUsername}`);
           this.user = user;
         } catch (err) {
           if (err.hasOwnProperty('response')) {
             switch (err.response.status) {
               case 404:
-                this.errMessage = `User ${this.username} not found`;
+                this.errMessage = `User ${this.filteredUsername} not found`;
                 break;
               case 403:
                 this.errMessage = `Access forbidden. Probably too many API requests in the last hour. Please try again later.`;
                 break;
               default:
-                this.errMessage = `There has been an error while reading information about user ${this.username}:<br/>` + err.message;
+                this.errMessage = `There has been an error while reading information about user ${this.filteredUsername}:<br/>` + err.message;
                 console.error(err);
             }
           }
@@ -127,7 +130,7 @@ export default {
           this.pendingRequest = true;
           this.errMessage = null;
           try {
-            const {data: gists} = await axios.get(`https://api.github.com/users/${this.username}/gists`);
+            const {data: gists} = await axios.get(`https://api.github.com/users/${this.filteredUsername}/gists`);
             this.gists = gists;
             const forksPromises = gists.map(gist => axios.get(gist.forks_url));
             const gistForks = await Promise.allSettled(forksPromises);
@@ -137,7 +140,7 @@ export default {
             });
 
           } catch (err) {
-            this.errMessage = `There has been an error reading gists from user ${this.username}<br/>` + err.message;
+            this.errMessage = `There has been an error reading gists from user ${this.filteredUsername}<br/>` + err.message;
           }
           finally {
             this.pendingRequest = false;

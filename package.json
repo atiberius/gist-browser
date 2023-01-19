@@ -10,6 +10,7 @@
   "dependencies": {
     "@highlightjs/vue-plugin": "github:highlightjs/vue-plugin",
     "axios": "^1.2.2",
+    "dompurify": "^2.4.3",
     "highlight.js": "^11.7.0",
     "install": "^0.13.0",
     "javascript-time-ago": "^2.5.9",
