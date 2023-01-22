@@ -7,7 +7,7 @@ A single page web application built with Vue.js 3 for browsing GitHub gists.
 2. Clone the repository: `git clone https://github.com/atiberius/gist-browser.git`
 3. Install dependencies: `npm install`
 4. Start the development server: `vite`
-5. (optional) create a .env file in the root folder and add the following line: `VITE_GITHUB_TOKEN=your_token_here`. This will allow you to make more requests to the GitHub API. Read more about GitHub API tokens [here](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token).
+5. (optional) create an .env file in the root folder and add the following line: `VITE_GITHUB_TOKEN=your_token_here`. This will allow you to make more requests to the GitHub API. Read more about GitHub API tokens [here](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token).
 
 ## Build
 1. Build the app: `vite build`
