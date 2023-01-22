@@ -6,10 +6,11 @@ A single page web application built with Vue.js 3 for browsing GitHub gists.
 1. Make sure you have the latest nodejs version installed. Read installation instructions [here](https://nodejs.org/en/download/). 
 2. Clone the repository: `git clone https://github.com/atiberius/gist-browser.git`
 3. Install dependencies: `npm install`
-4. Start the development server: `npm run dev`
+4. Start the development server: `vite`
+5. (optional) create a .env file in the root folder and add the following line: `VITE_GITHUB_TOKEN=your_token_here`. This will allow you to make more requests to the GitHub API. Read more about GitHub API tokens [here](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token).
 
 ## Build
-1. Build the app: `npm run build`
+1. Build the app: `vite build`
 
 ## Features
 The app opens with a search field where you can type a GitHub username and click on the 'Search' button or press Enter on the keyboard.
@@ -31,7 +32,7 @@ In the future, an additional button to copy the code in the clipboard might prov
 - [Axios](https://axios-http.com/) was used for all external API calls
 
 ## Notes
-- Because the API calls to GitHub are made from the browser, the user is limited to 60 requests per hour. This is a limitation of the GitHub API and not the app itself. 
+- Because the API calls to GitHub are made from the browser, if you are not using a github token (step 5 above), the user is limited to 60 requests per hour. This is a limitation of the GitHub API and not the app itself. 
 - The forks for each gist are loaded by creating multiple threads to fetch the forks for each gist. This might pose an issue if GitHub API decides to limit the number of concurrent requests in the future.
 - To avoid contents overflow, some lists have autoscrolling: the list of gists has vertical auto scrolling and the list of forks for each gist has horizontal auto scrolling.
 - For performance reasons, the file contents for each gist are not loaded until the user clicks on the gist's title. The result is cached, to avoid making repeated requests to the GitHub API endpoint. In the future, a separate 'Refresh' button can be added to trigger refreshing the file contents.

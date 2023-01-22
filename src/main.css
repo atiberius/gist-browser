@@ -42,7 +42,7 @@ a,
 
 #searchForm {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
   justify-content: center;
 }
@@ -187,4 +187,9 @@ img.forkedByAvatar {
   font-weight: bolder;
   text-decoration: underline;
   margin-bottom: 1vh;
+}
+
+#usingGithubToken {
+  color: green;
+  font-size: .8em;
 }

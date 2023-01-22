@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="getGists">
     <div id="searchForm">
-    <div id="githubToken" v-if="githubToken">
+    <div id="usingGithubToken" v-if="githubToken">
       <p>Using GitHub token</p>
     </div>
     <div id="searchBar">
