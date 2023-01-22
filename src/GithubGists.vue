@@ -77,7 +77,6 @@ import { AccordionList, AccordionItem } from "vue3-rich-accordion";
 import TimeAgo from 'javascript-time-ago';
 import DOMPurify from 'dompurify';
 
-
 import "vue3-rich-accordion/accordion-library-styles.css";
 import 'highlight.js/styles/default.css';
 
@@ -92,7 +91,7 @@ export default {
       username: '',
       filteredUsername: '',
       user: null,
-      githubToken: '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',
+      githubToken: import.meta.env.VITE_GITHUB_TOKEN,
       gists: [],
       currentFileIndex: 0,
       gistFileContents: [],
