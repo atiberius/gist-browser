@@ -1,6 +1,9 @@
 <template>
   <form @submit.prevent="getGists">
     <div id="searchForm">
+    <div id="githubToken" v-if="githubToken">
+      <p>Using GitHub token</p>
+    </div>
     <div id="searchBar">
       <input placeholder="Github username" v-model="username" type="text" id="username"/>
       <button type="submit">Search</button>
@@ -89,6 +92,7 @@ export default {
       username: '',
       filteredUsername: '',
       user: null,
+      githubToken: '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',
       gists: [],
       currentFileIndex: 0,
       gistFileContents: [],
@@ -106,7 +110,8 @@ export default {
         this.gistFileContents = [];
         try {
           this.filteredUsername = DOMPurify.sanitize(this.username);
-          const {data: user} = await axios.get(`https://api.github.com/users/${this.filteredUsername}`);
+          const headers = this.githubToken ? { 'Authorization': `Token ${this.githubToken}` } : {}
+          const {data: user} = await axios.get(`https://api.github.com/users/${this.filteredUsername}`, {headers});
           this.user = user;
         } catch (err) {
           if (err.hasOwnProperty('response')) {
@@ -132,14 +137,15 @@ export default {
           this.pendingRequest = true;
           this.errMessage = null;
           try {
-            const {data: gists} = await axios.get(`https://api.github.com/users/${this.filteredUsername}/gists`);
+            const headers = this.githubToken ? { 'Authorization': `Token ${this.githubToken}` } : {}
+            const {data: gists} = await axios.get(`https://api.github.com/users/${this.filteredUsername}/gists`,{headers});
             this.gists = gists;
             gists.forEach((gist, ) => {
               gist.title = gist.title ?gist.title : (gist.description ?gist.description.substring(0, 100) + (gist.description.length > 100 ?'...' :'') :'[No title]');
               gist.createdDateFriendly = new Date(gist.created_at);
               gist.timeAgo = this.timeAgoFormatter.format(gist.createdDateFriendly);
             })
-            const forksPromises = gists.map(gist => axios.get(gist.forks_url));
+            const forksPromises = gists.map(gist => axios.get(gist.forks_url,{headers}));
             const gistForks = await Promise.allSettled(forksPromises);
 
             gists.forEach((gist, index) => {
@@ -168,7 +174,8 @@ export default {
       }
       else {
         try {
-          const {data} = await axios.get(`https://api.github.com/gists/${id}`);
+          const headers = this.githubToken ? { 'Authorization': `Token ${this.githubToken}` } : {}
+          const {data} = await axios.get(`https://api.github.com/gists/${id}`, {headers});
           this.gistFileContents[id] = [];
           Object.entries(data.files).forEach(entry => {
             const [filename, details] = entry;
